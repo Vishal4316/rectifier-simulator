@@ -418,7 +418,7 @@ const SinglePhaseFullWaveSVG: React.FC<{
         type={config.switches['T1'] || 'thyristor'}
         isConducting={isT1}
         onToggle={onToggleSwitch}
-        direction="down"
+        direction="up"
         labelOffset={{ x: 26, y: 0 }}
       />
       <line x1="210" y1="140" x2="210" y2="220" stroke={wireStroke(isT1 || isT4)} strokeWidth={2} />
@@ -429,7 +429,7 @@ const SinglePhaseFullWaveSVG: React.FC<{
         type={config.switches['T4'] || 'thyristor'}
         isConducting={isT4}
         onToggle={onToggleSwitch}
-        direction="down"
+        direction="up"
         labelOffset={{ x: 26, y: 0 }}
       />
       <line x1="210" y1="270" x2="210" y2="300" stroke={wireStroke(isT4)} strokeWidth={wireWidth(isT4)} />
@@ -443,7 +443,7 @@ const SinglePhaseFullWaveSVG: React.FC<{
         type={config.switches['T3'] || 'thyristor'}
         isConducting={isT3}
         onToggle={onToggleSwitch}
-        direction="down"
+        direction="up"
         labelOffset={{ x: 26, y: 0 }}
       />
       <line x1="340" y1="140" x2="340" y2="220" stroke={wireStroke(isT3 || isT2)} strokeWidth={2} />
@@ -454,7 +454,7 @@ const SinglePhaseFullWaveSVG: React.FC<{
         type={config.switches['T2'] || 'thyristor'}
         isConducting={isT2}
         onToggle={onToggleSwitch}
-        direction="down"
+        direction="up"
         labelOffset={{ x: 26, y: 0 }}
       />
       <line x1="340" y1="270" x2="340" y2="300" stroke={wireStroke(isT2)} strokeWidth={wireWidth(isT2)} />
@@ -830,7 +830,7 @@ const ThreePhaseFullWaveSVG: React.FC<{
         type={config.switches['T1'] || 'thyristor'}
         isConducting={isT1}
         onToggle={onToggleSwitch}
-        direction="down"
+        direction="up"
         labelOffset={{ x: 26, y: 0 }}
       />
       <line x1="180" y1="135" x2="180" y2="235" stroke={wireStroke(isT1 || isT4)} strokeWidth={2} />
@@ -841,7 +841,7 @@ const ThreePhaseFullWaveSVG: React.FC<{
         type={config.switches['T4'] || 'thyristor'}
         isConducting={isT4}
         onToggle={onToggleSwitch}
-        direction="down"
+        direction="up"
         labelOffset={{ x: 26, y: 0 }}
       />
       <line x1="180" y1="285" x2="180" y2="320" stroke={wireStroke(isT4)} strokeWidth={wireWidth(isT4)} />
@@ -863,7 +863,7 @@ const ThreePhaseFullWaveSVG: React.FC<{
         type={config.switches['T3'] || 'thyristor'}
         isConducting={isT3}
         onToggle={onToggleSwitch}
-        direction="down"
+        direction="up"
         labelOffset={{ x: 26, y: 0 }}
       />
       <line x1="300" y1="135" x2="300" y2="235" stroke={wireStroke(isT3 || isT6)} strokeWidth={2} />
@@ -874,7 +874,7 @@ const ThreePhaseFullWaveSVG: React.FC<{
         type={config.switches['T6'] || 'thyristor'}
         isConducting={isT6}
         onToggle={onToggleSwitch}
-        direction="down"
+        direction="up"
         labelOffset={{ x: 26, y: 0 }}
       />
       <line x1="300" y1="285" x2="300" y2="320" stroke={wireStroke(isT6)} strokeWidth={wireWidth(isT6)} />
@@ -896,7 +896,7 @@ const ThreePhaseFullWaveSVG: React.FC<{
         type={config.switches['T5'] || 'thyristor'}
         isConducting={isT5}
         onToggle={onToggleSwitch}
-        direction="down"
+        direction="up"
         labelOffset={{ x: 26, y: 0 }}
       />
       <line x1="420" y1="135" x2="420" y2="235" stroke={wireStroke(isT5 || isT2)} strokeWidth={2} />
@@ -907,7 +907,7 @@ const ThreePhaseFullWaveSVG: React.FC<{
         type={config.switches['T2'] || 'thyristor'}
         isConducting={isT2}
         onToggle={onToggleSwitch}
-        direction="down"
+        direction="up"
         labelOffset={{ x: 26, y: 0 }}
       />
       <line x1="420" y1="285" x2="420" y2="320" stroke={wireStroke(isT2)} strokeWidth={wireWidth(isT2)} />

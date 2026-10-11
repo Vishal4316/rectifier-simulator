@@ -62,7 +62,7 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = ({
     const width = rect.width;
     const height = rect.height;
 
-    // Resize canvas to match display size for crisp retina graphics
+    // Resize canvas to match display size for crisp graphics
     if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
       canvas.width = width * dpr;
       canvas.height = height * dpr;
@@ -75,11 +75,10 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = ({
     ctx.fillStyle = '#090d16';
     ctx.fillRect(0, 0, width, height);
 
-    // Split canvas vertically into two main scopes:
-    // Scope 1 (Top 48%): Supply Voltage + Gate Pulses
-    // Scope 2 (Bottom 48%): Output Voltage (Vo) + Load Current (Io)
-    const margin = { left: 55, right: 25, top: 20, bottom: 25 };
-    const plotWidth = width - margin.left - margin.right;
+    // Split canvas vertically into two scopes with dual Y-axis margins:
+    // Left margin 55px (Voltage Vo & Vin), Right margin 55px (Current Io)
+    const margin = { left: 55, right: 55, top: 22, bottom: 25 };
+    const plotWidth = Math.max(10, width - margin.left - margin.right);
     const totalPlotHeight = height - margin.top - margin.bottom;
     const gap = 16;
     const scopeHeight = (totalPlotHeight - gap) / 2;
@@ -94,7 +93,7 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = ({
       ctx.lineWidth = 1;
       ctx.strokeRect(margin.left, yTop, plotWidth, h);
 
-      // Horizontal subdivisions (5 horizontal lines)
+      // Horizontal subdivisions (4 grid lanes)
       ctx.strokeStyle = 'rgba(51, 65, 85, 0.4)';
       ctx.lineWidth = 0.5;
       for (let i = 1; i < 4; i++) {
@@ -116,7 +115,7 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = ({
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Vertical degree grid (0, 90, 180, 270, 360)
+      // Vertical degree grid (0, 45, 90, 135, 180, 225, 270, 315, 360)
       for (let deg = 0; deg <= 360; deg += 45) {
         const x = margin.left + (deg / 360) * plotWidth;
         ctx.strokeStyle = deg % 90 === 0 ? 'rgba(71, 85, 105, 0.6)' : 'rgba(51, 65, 85, 0.25)';
@@ -147,9 +146,9 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = ({
 
     // Draw Grids
     drawGrid(topScopeY, scopeHeight, 'CH1: AC Source & Firing Trigger', '[Volts]');
-    drawGrid(bottomScopeY, scopeHeight, 'CH2 & CH3: Rectified Vo & Load Current Io', '[V / A]');
+    drawGrid(bottomScopeY, scopeHeight, 'CH2: Rectified Vo & CH3: Load Current Io', '[Left: Vo (V) | Right: Io (A)]');
 
-    // Max Voltage Scale Calculation
+    // Max Scale Calculation
     const Vpeak = Math.max(
       config.Vrms * Math.SQRT2 * 1.25,
       ...result.samples.map((s) => Math.abs(s.vOut)),
@@ -203,24 +202,38 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = ({
       }
     }
 
-    // --- PLOT 1b: GATE FIRING PULSES ---
+    // --- PLOT 1b: GATE FIRING PULSES (Sharp Trigger Markers) ---
     if (showGate) {
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 2.5;
       for (let i = 0; i < N; i++) {
-        if (samples[i].gatePulse) {
+        const prev = samples[(i - 1 + N) % N];
+        // Trigger on rising edge of gatePulse
+        if (samples[i].gatePulse && !prev.gatePulse) {
           const x = degToX(samples[i].thetaDeg);
           const zeroY = topScopeY + scopeHeight / 2;
+          const tipY = zeroY - scopeHeight * 0.42;
+
+          // Pulse stem
+          ctx.strokeStyle = '#f59e0b';
+          ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.moveTo(x, zeroY);
-          ctx.lineTo(x, zeroY - scopeHeight * 0.35);
+          ctx.lineTo(x, tipY);
           ctx.stroke();
 
-          // Pulse tip marker
+          // Pulse arrowhead marker
           ctx.fillStyle = '#fbbf24';
           ctx.beginPath();
-          ctx.arc(x, zeroY - scopeHeight * 0.35, 3, 0, Math.PI * 2);
+          ctx.moveTo(x, tipY);
+          ctx.lineTo(x - 3.5, tipY + 6);
+          ctx.lineTo(x + 3.5, tipY + 6);
+          ctx.closePath();
           ctx.fill();
+
+          // Label
+          ctx.fillStyle = '#fbbf24';
+          ctx.font = 'bold 9px monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(`Trig`, x, tipY - 4);
         }
       }
     }
@@ -306,7 +319,8 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = ({
     }
 
     // --- PLAYHEAD / PHASE ANGLE CURSOR ---
-    const playheadX = degToX(currentAngleDeg);
+    const currentAngle = angleRef.current;
+    const playheadX = degToX(currentAngle);
     ctx.strokeStyle = '#38bdf8';
     ctx.lineWidth = 2;
     ctx.setLineDash([3, 2]);
@@ -330,7 +344,7 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = ({
     ctx.arc(playheadX, bottomScopeY + scopeHeight, 4.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Voltage scale values on Y-axis (Scope 1)
+    // Voltage scale values on Left Y-axis (Scope 1)
     ctx.fillStyle = '#64748b';
     ctx.font = '10px monospace';
     ctx.textAlign = 'right';
@@ -338,26 +352,43 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = ({
     ctx.fillText(`0V`, margin.left - 6, topScopeY + scopeHeight / 2 + 4);
     ctx.fillText(`-${Vpeak.toFixed(0)}V`, margin.left - 6, topScopeY + scopeHeight - 2);
 
-    // Voltage/Current scale values on Y-axis (Scope 2)
+    // Voltage scale values on Left Y-axis (Scope 2: Vo in Emerald)
+    ctx.fillStyle = '#34d399';
     ctx.fillText(`+${Vpeak.toFixed(0)}V`, margin.left - 6, bottomScopeY + 12);
     ctx.fillText(`0V`, margin.left - 6, bottomScopeY + scopeHeight / 2 + 4);
     ctx.fillText(`-${Vpeak.toFixed(0)}V`, margin.left - 6, bottomScopeY + scopeHeight - 2);
+
+    // Current scale values on Right Y-axis (Scope 2: Io in Purple)
+    ctx.fillStyle = '#c084fc';
+    ctx.textAlign = 'left';
+    ctx.fillText(`+${Ipeak.toFixed(1)}A`, margin.left + plotWidth + 6, bottomScopeY + 12);
+    ctx.fillText(`0A`, margin.left + plotWidth + 6, bottomScopeY + scopeHeight / 2 + 4);
+    ctx.fillText(`-${Ipeak.toFixed(1)}A`, margin.left + plotWidth + 6, bottomScopeY + scopeHeight - 2);
 
     ctx.restore();
   }, [
     result,
     config,
-    currentAngleDeg,
     showSupply,
     showGate,
     showVout,
     showIout,
   ]);
 
-  // Handle animation loop with angleRef to avoid 60fps effect teardowns
+  // Keep a ref to the render function to avoid cancelling requestAnimationFrame every frame
+  const renderCanvasRef = useRef(renderCanvas);
+  renderCanvasRef.current = renderCanvas;
+
+  // Render on initial load or parameter change
+  useEffect(() => {
+    renderCanvas();
+  }, [renderCanvas]);
+
+  // Smooth 60fps animation loop without effect teardown
   useEffect(() => {
     let animId: number;
     let lastTime = performance.now();
+    let throttleCounter = 0;
 
     const loop = (now: number) => {
       if (isPlaying) {
@@ -366,17 +397,23 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = ({
         const degPerSec = 360 * config.frequency * playSpeed * 0.2;
         const nextAngle = (angleRef.current + degPerSec * deltaSec) % 360;
         angleRef.current = nextAngle;
-        onAngleChange(nextAngle);
+
+        // Sync with React parent for schematic animation
+        throttleCounter++;
+        if (throttleCounter % 2 === 0) {
+          onAngleChange(nextAngle);
+        }
       } else {
         lastTime = now;
       }
-      renderCanvas();
+
+      renderCanvasRef.current();
       animId = requestAnimationFrame(loop);
     };
 
     animId = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(animId);
-  }, [isPlaying, playSpeed, config.frequency, onAngleChange, renderCanvas]);
+  }, [isPlaying, playSpeed, config.frequency, onAngleChange]);
 
   // Mouse hover for crosshair inspection
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -387,7 +424,7 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = ({
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    const margin = { left: 55, right: 25 };
+    const margin = { left: 55, right: 55 };
     const plotWidth = rect.width - margin.left - margin.right;
 
     if (mouseX < margin.left || mouseX > margin.left + plotWidth) {
@@ -421,13 +458,14 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = ({
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
-    const margin = { left: 55, right: 25 };
+    const margin = { left: 55, right: 55 };
     const plotWidth = rect.width - margin.left - margin.right;
 
     if (mouseX >= margin.left && mouseX <= margin.left + plotWidth) {
       const deg = ((mouseX - margin.left) / plotWidth) * 360;
       angleRef.current = deg;
       onAngleChange(deg);
+      renderCanvasRef.current();
     }
   };
 
@@ -469,6 +507,7 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = ({
             onClick={() => {
               angleRef.current = 0;
               onAngleChange(0);
+              renderCanvasRef.current();
             }}
             title="Reset Phase to 0°"
             className={`p-1.5 rounded-xl transition-colors border ${
@@ -631,6 +670,7 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = ({
             const val = Number(e.target.value);
             angleRef.current = val;
             onAngleChange(val);
+            renderCanvasRef.current();
           }}
           className={`flex-1 accent-cyan-400 h-1.5 rounded-lg cursor-pointer ${
             isDark ? 'bg-slate-800' : 'bg-slate-200'

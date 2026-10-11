@@ -100,27 +100,129 @@ export const TheoryPanel: React.FC<TheoryPanelProps> = ({
             </ul>
           </div>
 
-          {/* Pulse Number & Ripple Comparison */}
+          {/* Complete Converter Equations Reference Table */}
           <div>
-            <h4 className="text-sm font-bold text-purple-500 flex items-center gap-1.5 mb-2">
-              Harmonic Ripple Frequencies
+            <h4 className="text-sm font-bold text-cyan-400 flex items-center gap-1.5 mb-2">
+              Comprehensive Textbook Converter Equations Reference
             </h4>
-            <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-              <div className={`p-2.5 rounded-lg border ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                <span className={`block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>1Φ Half-Wave:</span>
-                <span className="text-cyan-500 font-bold">1-Pulse (50Hz / f)</span>
+            <div className={`overflow-x-auto rounded-xl border text-xs ${isDark ? 'border-slate-800 bg-slate-950/70' : 'border-slate-200 bg-slate-50'}`}>
+              <table className="w-full text-left font-mono">
+                <thead>
+                  <tr className={`border-b ${isDark ? 'border-slate-800 text-slate-400 bg-slate-900/80' : 'border-slate-200 text-slate-600 bg-slate-100'}`}>
+                    <th className="p-2.5">Topology</th>
+                    <th className="p-2.5">Control Type</th>
+                    <th className="p-2.5">Average DC Voltage (Vdc)</th>
+                    <th className="p-2.5">Ripple Freq</th>
+                  </tr>
+                </thead>
+                <tbody className={`divide-y ${isDark ? 'divide-slate-800/60' : 'divide-slate-200'}`}>
+                  <tr>
+                    <td className="p-2.5 font-sans font-medium">1Φ Half-Wave</td>
+                    <td className="p-2.5 text-cyan-400">Diode (R load / with FWD)</td>
+                    <td className="p-2.5 font-bold text-emerald-400">Vm / π</td>
+                    <td className="p-2.5 text-slate-400">f (50 Hz)</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5 font-sans font-medium">1Φ Half-Wave</td>
+                    <td className="p-2.5 text-amber-400">Thyristor (with FWD)</td>
+                    <td className="p-2.5 font-bold text-emerald-400">(Vm / 2π) * (1 + cos α)</td>
+                    <td className="p-2.5 text-slate-400">f (50 Hz)</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5 font-sans font-medium">1Φ Half-Wave</td>
+                    <td className="p-2.5 text-amber-400">Thyristor (without FWD, DCM)</td>
+                    <td className="p-2.5 font-bold text-emerald-400">(Vm / 2π) * (cos α - cos β)</td>
+                    <td className="p-2.5 text-slate-400">f (50 Hz)</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5 font-sans font-medium">1Φ Full-Wave</td>
+                    <td className="p-2.5 text-cyan-400">Diode Bridge</td>
+                    <td className="p-2.5 font-bold text-emerald-400">2Vm / π</td>
+                    <td className="p-2.5 text-slate-400">2f (100 Hz)</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5 font-sans font-medium">1Φ Full-Wave</td>
+                    <td className="p-2.5 text-purple-400">Semi-Converter / with FWD</td>
+                    <td className="p-2.5 font-bold text-emerald-400">(Vm / π) * (1 + cos α)</td>
+                    <td className="p-2.5 text-slate-400">2f (100 Hz)</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5 font-sans font-medium">1Φ Full-Wave</td>
+                    <td className="p-2.5 text-amber-400">Fully Controlled (CCM)</td>
+                    <td className="p-2.5 font-bold text-emerald-400">(2Vm / π) * cos α</td>
+                    <td className="p-2.5 text-slate-400">2f (100 Hz)</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5 font-sans font-medium">3Φ Half-Wave</td>
+                    <td className="p-2.5 text-cyan-400">Diode 3-Pulse</td>
+                    <td className="p-2.5 font-bold text-emerald-400">3√3 Vm,ph / 2π</td>
+                    <td className="p-2.5 text-slate-400">3f (150 Hz)</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5 font-sans font-medium">3Φ Half-Wave</td>
+                    <td className="p-2.5 text-amber-400">Controlled (α ≤ 30° / CCM)</td>
+                    <td className="p-2.5 font-bold text-emerald-400">(3√3 Vm,ph / 2π) * cos α</td>
+                    <td className="p-2.5 text-slate-400">3f (150 Hz)</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5 font-sans font-medium">3Φ Full-Wave</td>
+                    <td className="p-2.5 text-cyan-400">6-Pulse Diode Bridge</td>
+                    <td className="p-2.5 font-bold text-emerald-400">3Vm,LL / π = 3√6 Vm,ph / π</td>
+                    <td className="p-2.5 text-slate-400">6f (300 Hz)</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5 font-sans font-medium">3Φ Full-Wave</td>
+                    <td className="p-2.5 text-purple-400">Semi-Converter (Half-Controlled)</td>
+                    <td className="p-2.5 font-bold text-emerald-400">(3Vm,LL / 2π) * (1 + cos α)</td>
+                    <td className="p-2.5 text-slate-400">6f (300 Hz)</td>
+                  </tr>
+                  <tr>
+                    <td className="p-2.5 font-sans font-medium">3Φ Full-Wave</td>
+                    <td className="p-2.5 text-amber-400">Controlled 6-Pulse Bridge</td>
+                    <td className="p-2.5 font-bold text-emerald-400">(3Vm,LL / π) * cos α</td>
+                    <td className="p-2.5 text-slate-400">6f (300 Hz)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Key Performance Metric Definitions */}
+          <div>
+            <h4 className="text-sm font-bold text-emerald-500 flex items-center gap-1.5 mb-2">
+              Performance Metrics & Analytical Definitions
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-sans">
+              <div className={`p-3 rounded-xl border ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                <div className="font-bold text-cyan-400 mb-1">Ripple Factor (RF)</div>
+                <div className="text-slate-400 font-mono text-[11px] mb-1">RF = √( (Vrms / Vdc)² - 1 )</div>
+                <div className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+                  Quantifies the proportion of AC harmonics remaining in the DC output voltage.
+                </div>
               </div>
-              <div className={`p-2.5 rounded-lg border ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                <span className={`block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>1Φ Full-Wave:</span>
-                <span className="text-emerald-500 font-bold">2-Pulse (100Hz / 2f)</span>
+
+              <div className={`p-3 rounded-xl border ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                <div className="font-bold text-emerald-400 mb-1">Form Factor (FF)</div>
+                <div className="text-slate-400 font-mono text-[11px] mb-1">FF = Vrms / Vdc</div>
+                <div className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+                  Ratio of RMS output voltage to average DC voltage (ideal pure DC = 1.00).
+                </div>
               </div>
-              <div className={`p-2.5 rounded-lg border ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                <span className={`block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>3Φ Half-Wave:</span>
-                <span className="text-amber-500 font-bold">3-Pulse (150Hz / 3f)</span>
+
+              <div className={`p-3 rounded-xl border ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                <div className="font-bold text-amber-400 mb-1">Extinction Angle (β)</div>
+                <div className="text-slate-400 font-mono text-[11px] mb-1">β: Angle where io(t) = 0</div>
+                <div className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+                  In DCM, the angle at which the inductor energy fully collapses and the thyristor commutates off.
+                </div>
               </div>
-              <div className={`p-2.5 rounded-lg border ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                <span className={`block ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>3Φ Full-Wave:</span>
-                <span className="text-purple-500 font-bold">6-Pulse (300Hz / 6f)</span>
+
+              <div className={`p-3 rounded-xl border ${isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                <div className="font-bold text-purple-400 mb-1">Power Factor (PF)</div>
+                <div className="text-slate-400 font-mono text-[11px] mb-1">PF = Pac / Sin</div>
+                <div className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+                  Ratio of active input power to total apparent grid power (Sin = √3 · VLL · Iline in 3Φ).
+                </div>
               </div>
             </div>
           </div>

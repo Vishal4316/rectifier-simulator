@@ -108,11 +108,13 @@ export const ConverterControls: React.FC<ConverterControlsProps> = ({
       onChangeConfig({ ...config, switches: updatedSwitches });
     } else if (type === 'semi_converter') {
       if (phase === '1P' && rectifier === 'FW') {
+        // Symmetrical 1-phase semi-converter: Top switches are thyristors (T1, T3), bottom switches are diodes (T4, T2)
         updatedSwitches['T1'] = 'thyristor';
-        updatedSwitches['T2'] = 'thyristor';
-        updatedSwitches['T3'] = 'diode';
+        updatedSwitches['T3'] = 'thyristor';
         updatedSwitches['T4'] = 'diode';
+        updatedSwitches['T2'] = 'diode';
       } else if (phase === '3P' && rectifier === 'FW') {
+        // 3-phase semi-converter: Top switches are thyristors (T1, T3, T5), bottom are diodes (T4, T6, T2)
         updatedSwitches['T1'] = 'thyristor';
         updatedSwitches['T3'] = 'thyristor';
         updatedSwitches['T5'] = 'thyristor';
@@ -298,7 +300,11 @@ export const ConverterControls: React.FC<ConverterControlsProps> = ({
           <div className="flex justify-between items-center text-xs mb-1">
             <span className={`font-semibold flex items-center gap-1.5 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
               Firing Angle (α)
-              <span className={`text-[10px] font-mono ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>0° – 180°</span>
+              {Object.values(switches).some((s) => s === 'thyristor') ? (
+                <span className={`text-[10px] font-mono ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>0° – 180°</span>
+              ) : (
+                <span className="text-[10px] text-cyan-400 font-mono font-medium">(Natural commutation at α = 0°)</span>
+              )}
             </span>
             <div className="flex items-center gap-1 font-mono">
               <input
